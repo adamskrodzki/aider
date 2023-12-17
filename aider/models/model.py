@@ -21,8 +21,6 @@ class Model:
         from .openrouter import OpenRouterModel
 
         if name == "mixtral-8x7B":
-            if not client or client.base_url.host != "openrouter.ai":
-                raise ValueError("The mixtral-8x7B model requires the openrouter.ai client.")
             return OpenRouterModel(client, "mistralai/mixtral-8x7b")
         elif client and client.base_url.host == "openrouter.ai":
             return OpenRouterModel(client, name)
