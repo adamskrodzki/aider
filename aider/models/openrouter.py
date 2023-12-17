@@ -7,7 +7,10 @@ cached_model_details = None
 
 class OpenRouterModel(Model):
     def __init__(self, client, name):
-        if name.startswith("gpt-4") or name.startswith("gpt-3.5-turbo"):
+        if name == "mixtral-8x7B":
+            name = "mistralai/mixtral-8x7b"
+            self.max_context_tokens = 32 * 1024  # 32 known tokens
+        elif name.startswith("gpt-4") or name.startswith("gpt-3.5-turbo"):
             name = "openai/" + name
 
         self.name = name
