@@ -41,19 +41,30 @@ class OpenRouterModel(Model):
                 return json.dumps({'id': details.id, 'context_length': details.context_length, 'pricing': details.pricing})
 
         def ensure_model_details_format(details):
-            if all(isinstance(detail, dict) and 'id' in detail and 'pricing' in detail and 'context_length' in detail for detail in details):
-                return details
-            else:
-                return [
-                    {
+            formatted_details = []
+            for detail in details:
+                if isinstance(detail, dict) and 'id' in detail and 'pricing' in detail and 'context_length' in detail:
+                    # If pricing is already a dict, use it directly
+                    pricing = detail['pricing'] if isinstance(detail['pricing'], dict) else {
+                        'prompt': detail.pricing.prompt,
+                        'completion': detail.pricing.completion
+                    }
+                    formatted_details.append({
+                        'id': detail['id'],
+                        'context_length': detail['context_length'],
+                        'pricing': pricing
+                    })
+                else:
+                    # If detail is not a dict or missing keys, construct the dict manually
+                    formatted_details.append({
                         'id': detail.id,
                         'context_length': detail.context_length,
                         'pricing': {
                             'prompt': detail.pricing.prompt,
                             'completion': detail.pricing.completion
-                        }
-                    } for detail in details
-                ]
+                        } if not isinstance(detail.pricing, dict) else detail.pricing
+                    })
+            return formatted_details
 
         print("Checking if cached_model_details needs to be refetched...")
         if cached_model_details is None:
