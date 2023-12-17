@@ -1,7 +1,7 @@
 
 # aider is AI pair programming in your terminal
 
-Aider is a command line tool that lets you pair program with GPT-3.5/GPT-4,
+Aider is a command line tool that lets you pair program with GPT-3.5/GPT-4/Mixtral 8x7B (experimental),
 to edit code stored in your local git repository.
 You can start a new project or work with an existing repo.
 Aider makes sure edits from GPT are
@@ -46,6 +46,18 @@ To use it, run aider like this:
 ```
 aider --model gpt-4-1106-preview
 ```
+
+## Experimental Mixtral 8x7B support
+
+In order to use Mixtral 8x7B, you need to run aider with
+
+aider -- model mixtral-8x7b
+
+all requests are on default routed via openrouter.ai
+
+You need to set 
+
+OPENAI_API_KEY environment variable to openrouter.ai API_KEY **NOT** OpenAI API KEY
 
 ## Getting started
 
