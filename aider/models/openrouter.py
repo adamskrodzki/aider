@@ -11,12 +11,16 @@ class OpenRouterModel(Model):
     OPENROUTER_BASE_URL = "https://api.openrouter.ai"
 
     def __init__(self, client, name):
+        global cached_model_details
         if name == "mixtral-8x7B":
             name = "mistralai/mixtral-8x7b"
             self.max_context_tokens = 32 * 1024  # 32 known tokens
             # Ensure the client is using openrouter.ai base URL for this model
             client.base_url = self.OPENROUTER_BASE_URL
+            cached_model_details = None
+            print("Using mixtral-8x7B")
         elif name.startswith("gpt-4") or name.startswith("gpt-3.5-turbo"):
+            print("Using openAI")
             name = "openai/" + name
             # Ensure the client is using the default OpenAI base URL for other models
             client.base_url = openai.api_base
@@ -38,11 +42,10 @@ class OpenRouterModel(Model):
                 # If the above fails, manually construct a dictionary
                 return json.dumps({'id': details.id, 'context_length': details.context_length, 'pricing': details.pricing})
 
-        global cached_model_details
         if cached_model_details is None:
             cached_model_details = client.models.list().data
         serialized_details = [serialize_model_details(detail) for detail in cached_model_details]
-        print("Serialized cached model details:", serialized_details)
+        print("Serialized cached model details!", serialized_details)
         found = next(
             (details for details in cached_model_details if details.get("id") == name), None
         )
