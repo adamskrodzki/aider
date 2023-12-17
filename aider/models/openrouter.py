@@ -31,6 +31,7 @@ class OpenRouterModel(Model):
         global cached_model_details
         if cached_model_details is None:
             cached_model_details = client.models.list().data
+        print("Cached model details:", cached_model_details)  # Added line to print cached_model_details
         found = next(
             (details for details in cached_model_details if details.get("id") == name), None
         )
