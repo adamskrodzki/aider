@@ -5,13 +5,21 @@ from .model import Model
 cached_model_details = None
 
 
+import openai
+
 class OpenRouterModel(Model):
+    OPENROUTER_BASE_URL = "https://api.openrouter.ai"
+
     def __init__(self, client, name):
         if name == "mixtral-8x7B":
             name = "mistralai/mixtral-8x7b"
             self.max_context_tokens = 32 * 1024  # 32 known tokens
+            # Ensure the client is using openrouter.ai base URL for this model
+            client.base_url = self.OPENROUTER_BASE_URL
         elif name.startswith("gpt-4") or name.startswith("gpt-3.5-turbo"):
             name = "openai/" + name
+            # Ensure the client is using the default OpenAI base URL for other models
+            client.base_url = openai.api_base
 
         self.name = name
         self.edit_format = edit_format_for_model(name)
