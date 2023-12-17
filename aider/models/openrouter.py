@@ -46,8 +46,8 @@ class OpenRouterModel(Model):
             cached_model_details = client.models.list().data
         if client.base_url == self.OPENROUTER_BASE_URL:
             # Deserialize the JSON strings into Python objects
-            deserialized_details = [json.loads(detail) for detail in serialized_details]
-            print("Deserialized cached model details!", deserialized_details)
+            print("Deserialized cached model details!", cached_model_details)
+            deserialized_details = cached_model_details
             # Use the deserialized objects to find the model details
             found = next(
                 (details for details in deserialized_details if details.get("id") == name), None
