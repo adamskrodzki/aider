@@ -8,20 +8,17 @@ cached_model_details = None
 import openai
 
 class OpenRouterModel(Model):
-    OPENROUTER_BASE_URL = "https://api.openrouter.ai"
+    OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1/"
 
     def __init__(self, client, name):
-        print(f"Initializing OpenRouterModel with name: {name}")
         global cached_model_details
-        if name == "mixtral-8x7B":
-            name = "mistralai/mixtral-8x7b"
+        if name == "mistralai/mixtral-8x7b":
+            name = "mistralai/mixtral-8x7b-instruct"
             self.max_context_tokens = 32 * 1024  # 32 known tokens
             # Ensure the client is using openrouter.ai base URL for this model
             client.base_url = self.OPENROUTER_BASE_URL
             cached_model_details = None
-            print("Using mixtral-8x7B")
         elif name.startswith("gpt-4") or name.startswith("gpt-3.5-turbo"):
-            print("Using openAI")
             name = "openai/" + name
             # Ensure the client is using the default OpenAI base URL for other models
             client.base_url = openai.api_base
@@ -45,7 +42,7 @@ class OpenRouterModel(Model):
 
         print("Checking if cached_model_details needs to be refetched...")
         if cached_model_details is None:
-            print("Refetching model details...")
+            print("Refetching model details...", client.base_url)
             cached_model_details = client.models.list().data
         serialized_details = [serialize_model_details(detail) for detail in cached_model_details]
         print("Serialized cached model details!", serialized_details)
