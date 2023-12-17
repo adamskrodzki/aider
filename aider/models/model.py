@@ -20,9 +20,14 @@ class Model:
         from .openai import OpenAIModel
         from .openrouter import OpenRouterModel
 
-        if client and client.base_url.host == "openrouter.ai":
+        if name == "mixtral-8x7B":
+            if not client or client.base_url.host != "openrouter.ai":
+                raise ValueError("The mixtral-8x7B model requires the openrouter.ai client.")
+            return OpenRouterModel(client, "mistralai/mixtral-8x7b")
+        elif client and client.base_url.host == "openrouter.ai":
             return OpenRouterModel(client, name)
-        return OpenAIModel(name)
+        else:
+            return OpenAIModel(name)
 
     def __str__(self):
         return self.name
