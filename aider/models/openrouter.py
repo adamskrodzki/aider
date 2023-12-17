@@ -40,10 +40,26 @@ class OpenRouterModel(Model):
                 # If the above fails, manually construct a dictionary
                 return json.dumps({'id': details.id, 'context_length': details.context_length, 'pricing': details.pricing})
 
+        def ensure_model_details_format(details):
+            if all(isinstance(detail, dict) and 'id' in detail and 'pricing' in detail and 'context_length' in detail for detail in details):
+                return details
+            else:
+                return [
+                    {
+                        'id': detail.id,
+                        'context_length': detail.context_length,
+                        'pricing': {
+                            'prompt': detail.pricing.prompt,
+                            'completion': detail.pricing.completion
+                        }
+                    } for detail in details
+                ]
+
         print("Checking if cached_model_details needs to be refetched...")
         if cached_model_details is None:
             print("Refetching model details...", client.base_url)
-            cached_model_details = client.models.list().data
+            model_details_data = client.models.list().data
+            cached_model_details = ensure_model_details_format(model_details_data)
         if client.base_url == self.OPENROUTER_BASE_URL:
             # Deserialize the JSON strings into Python objects
             print("Deserialized cached model details!", cached_model_details)
