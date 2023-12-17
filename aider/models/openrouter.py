@@ -44,11 +44,18 @@ class OpenRouterModel(Model):
         if cached_model_details is None:
             print("Refetching model details...", client.base_url)
             cached_model_details = client.models.list().data
-        serialized_details = [serialize_model_details(detail) for detail in cached_model_details]
-        print("Serialized cached model details!", serialized_details)
-        found = next(
-            (details for details in cached_model_details if details.get("id") == name), None
-        )
+        if client.base_url == self.OPENROUTER_BASE_URL:
+            # Deserialize the JSON strings into Python objects
+            deserialized_details = [json.loads(detail) for detail in serialized_details]
+            print("Deserialized cached model details!", deserialized_details)
+            # Use the deserialized objects to find the model details
+            found = next(
+                (details for details in deserialized_details if details.get("id") == name), None
+            )
+        else:
+            found = next(
+                (details for details in cached_model_details if details.get("id") == name), None
+            )
 
         if found:
             self.max_context_tokens = int(found.get("context_length"))
