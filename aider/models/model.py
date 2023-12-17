@@ -20,8 +20,9 @@ class Model:
         from .openai import OpenAIModel
         from .openrouter import OpenRouterModel
 
-        if name == "mixtral-8x7B":
-            return OpenRouterModel(client, "mistralai/mixtral-8x7b")
+        # Correct the typo in the model name from "mixtral-8x7B" to "mistral-8x7B"
+        if name == "mistral-8x7B":
+            return OpenRouterModel(client, "mistralai/mistral-8x7b")
         elif client and client.base_url.host == "openrouter.ai":
             return OpenRouterModel(client, name)
         else:
