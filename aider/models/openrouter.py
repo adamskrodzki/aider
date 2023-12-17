@@ -11,6 +11,7 @@ class OpenRouterModel(Model):
     OPENROUTER_BASE_URL = "https://api.openrouter.ai"
 
     def __init__(self, client, name):
+        print(f"Initializing OpenRouterModel with name: {name}")
         global cached_model_details
         if name == "mixtral-8x7B":
             name = "mistralai/mixtral-8x7b"
@@ -42,7 +43,9 @@ class OpenRouterModel(Model):
                 # If the above fails, manually construct a dictionary
                 return json.dumps({'id': details.id, 'context_length': details.context_length, 'pricing': details.pricing})
 
+        print("Checking if cached_model_details needs to be refetched...")
         if cached_model_details is None:
+            print("Refetching model details...")
             cached_model_details = client.models.list().data
         serialized_details = [serialize_model_details(detail) for detail in cached_model_details]
         print("Serialized cached model details!", serialized_details)
