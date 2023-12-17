@@ -28,10 +28,21 @@ class OpenRouterModel(Model):
         # TODO: figure out proper encodings for non openai models
         self.tokenizer = tiktoken.get_encoding("cl100k_base")
 
+        import json
+
+        def serialize_model_details(details):
+            try:
+                # Attempt to serialize the model details directly
+                return json.dumps(details, default=lambda o: o.__dict__)
+            except TypeError:
+                # If the above fails, manually construct a dictionary
+                return json.dumps({'id': details.id, 'context_length': details.context_length, 'pricing': details.pricing})
+
         global cached_model_details
         if cached_model_details is None:
             cached_model_details = client.models.list().data
-        print("Cached model details:", cached_model_details)  # Added line to print cached_model_details
+        serialized_details = [serialize_model_details(detail) for detail in cached_model_details]
+        print("Serialized cached model details:", serialized_details)
         found = next(
             (details for details in cached_model_details if details.get("id") == name), None
         )
