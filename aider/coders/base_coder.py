@@ -238,7 +238,8 @@ class Coder:
 
     def abs_root_path(self, path):
         res = Path(self.root) / path
-        return utils.safe_abs_path(res)
+        sanitized_path = str(res).replace('\\', '/')
+        return utils.safe_abs_path(sanitized_path)
 
     fences = [
         ("``" + "`", "``" + "`"),
