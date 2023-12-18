@@ -66,21 +66,11 @@ class OpenRouterModel(Model):
                     })
             return formatted_details
 
-        print("Checking if cached_model_details needs to be refetched...")
         if cached_model_details is None:
-            print("Refetching model details...", client.base_url)
             model_details_data = client.models.list().data
             cached_model_details = ensure_model_details_format(model_details_data)
-        if client.base_url == self.OPENROUTER_BASE_URL:
-            # Deserialize the JSON strings into Python objects
-            print("Deserialized cached model details!", cached_model_details)
-            deserialized_details = cached_model_details
-            # Use the deserialized objects to find the model details
-            found = next(
-                (details for details in deserialized_details if details.get("id") == name), None
-            )
-        else:
-            found = next(
+
+        found = next(
                 (details for details in cached_model_details if details.get("id") == name), None
             )
 
