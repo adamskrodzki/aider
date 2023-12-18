@@ -1,1 +1,5 @@
 .aider*
+aider/__pycache__/
+aider/coders/__pycache__/
+aider/models/__pycache__/
+aider_chat.egg-info/
