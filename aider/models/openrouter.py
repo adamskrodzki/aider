@@ -84,7 +84,11 @@ class OpenRouterModel(Model):
 
 # TODO run benchmarks and figure out which models support which edit-formats
 def edit_format_for_model(name):
-    if any(str in name for str in ["gpt-4", "claude-2", "mistralai/mixtral-8x7b"]):
+    if any(str in name for str in ["gpt-4", "claude-2"]):
         return "diff"
+
+    if name.startswith("mistralai/mixtral"):
+        print("Picking whole file edit for mistral")
+        return "whole" #TODO, create separate coder
 
     return "whole"

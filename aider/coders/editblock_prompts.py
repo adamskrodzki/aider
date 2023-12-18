@@ -60,7 +60,7 @@ if __name__ == '__main__':
 
 ## ASSISTANT:
 
-Do make this change we need to modify `mathweb/flask/app.py` to:
+To make this change we need to modify `mathweb/flask/app.py` to:
 
 1. Import the math package.
 2. Remove the existing factorial() function.
