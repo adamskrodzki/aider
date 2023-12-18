@@ -51,13 +51,12 @@ aider --model gpt-4-1106-preview
 
 In order to use Mixtral 8x7B, you need to run aider with
 
-aider -- model mixtral-8x7b
+aider --model mixtral-8x7b
 
-all requests are on default routed via openrouter.ai
 
-You need to set 
+mistralai/mixtral-8x7b-instruct will be used, all requests are on default routed via openrouter.ai
 
-OPENAI_API_KEY environment variable to openrouter.ai API_KEY **NOT** OpenAI API KEY
+You need to set OPENAI_API_KEY environment variable to openrouter.ai API_KEY **NOT** OpenAI API KEY
 
 ## Getting started
 
