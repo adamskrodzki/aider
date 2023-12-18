@@ -88,6 +88,8 @@ class Coder:
             return WholeFileCoder(client, main_model, io, **kwargs)
         elif edit_format == "udiff":
             return UnifiedDiffCoder(client, main_model, io, **kwargs)
+        elif edit_format == "mixtral":
+            return EditBlockCoder(client, main_model, io, **kwargs)
         else:
             raise ValueError(f"Unknown edit format {edit_format}")
 
