@@ -53,6 +53,7 @@ class Coder:
     last_keyboard_interrupt = None
     max_apply_update_errors = 3
     edit_format = None
+    custom_prefixes = False
 
     @classmethod
     def create(
@@ -64,7 +65,7 @@ class Coder:
         skip_model_availabily_check=False,
         **kwargs,
     ):
-        from . import EditBlockCoder, UnifiedDiffCoder, WholeFileCoder
+        from . import EditBlockCoder, UnifiedDiffCoder, WholeFileCoder, MixtralCoder
 
         if not main_model:
             main_model = models.GPT4
@@ -89,7 +90,7 @@ class Coder:
         elif edit_format == "udiff":
             return UnifiedDiffCoder(client, main_model, io, **kwargs)
         elif edit_format == "mixtral":
-            return EditBlockCoder(client, main_model, io, **kwargs)
+            return MixtralCoder(client, main_model, io, **kwargs)
         else:
             raise ValueError(f"Unknown edit format {edit_format}")
 
@@ -301,9 +302,12 @@ class Coder:
 
         prompt = ""
         for fname, content in self.get_abs_fnames_content():
+            name_prefix = ""
+            if self.custom_prefixes:
+                name_prefix = "File from repository:"
             relative_fname = self.get_rel_fname(fname)
             prompt += "\n"
-            prompt += relative_fname
+            prompt += (name_prefix + relative_fname)
             prompt += f"\n{self.fence[0]}\n"
 
             prompt += content
@@ -449,17 +453,32 @@ class Coder:
         main_sys = self.fmt_system_prompt(self.gpt_prompts.main_system)
         main_sys += "\n" + self.fmt_system_prompt(self.gpt_prompts.system_reminder)
 
-        messages = [
-            dict(role="system", content=main_sys),
-        ]
+        messages = []
 
-        self.summarize_end()
-        messages += self.done_messages
-        messages += self.get_files_messages()
+        if self.custom_prefixes:
+            self.summarize_end()
+            messages += self.done_messages
+            messages += self.get_files_messages()
+            messages += [
+                dict(role="user", content=main_sys),
+                dict(role="assistant", content="Understood. I will follow your instructions carefully"),
+            ]
+        else:
+            messages += [
+                dict(role="system", content=main_sys),
+            ]
+            self.summarize_end()
+            messages += self.done_messages
+            messages += self.get_files_messages()
 
-        reminder_message = [
-            dict(role="system", content=self.fmt_system_prompt(self.gpt_prompts.system_reminder)),
-        ]
+
+
+        if self.custom_prefixes == False:
+            reminder_message = [
+                dict(role="system", content=self.fmt_system_prompt(self.gpt_prompts.system_reminder)),
+            ]
+        else:
+            reminder_message = []
 
         messages_tokens = self.main_model.token_count(messages)
         reminder_tokens = self.main_model.token_count(reminder_message)
@@ -471,15 +490,24 @@ class Coder:
             # add the reminder anyway
             total_tokens = 0
 
-        messages += self.cur_messages
+        if self.custom_prefixes:
+            # Add the reminder prompt if we still have room to include it.
+            if total_tokens < self.main_model.max_context_tokens:
+                messages += reminder_message
 
-        # Add the reminder prompt if we still have room to include it.
-        if total_tokens < self.main_model.max_context_tokens:
-            messages += reminder_message
+            messages += self.cur_messages
+        else:
+            messages += self.cur_messages
+
+            # Add the reminder prompt if we still have room to include it.
+            if total_tokens < self.main_model.max_context_tokens:
+                messages += reminder_message
+
 
         return messages
 
     def send_new_user_message(self, inp):
+
         self.cur_messages += [
             dict(role="user", content=inp),
         ]
