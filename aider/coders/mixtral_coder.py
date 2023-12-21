@@ -5,14 +5,15 @@ from pathlib import Path
 
 from ..dump import dump  # noqa: F401
 from .base_coder import Coder
-from .editblock_prompts import EditBlockPrompts
+from .mixtral_prompts import MixtralPrompts
 
 
-class EditBlockCoder(Coder):
+class MixtralCoder(Coder):
     edit_format = "diff"
 
     def __init__(self, *args, **kwargs):
-        self.gpt_prompts = EditBlockPrompts()
+        self.gpt_prompts = MixtralPrompts()
+        self.custom_prefixes = True 
         super().__init__(*args, **kwargs)
 
     def get_edits(self):

@@ -88,7 +88,6 @@ def edit_format_for_model(name):
         return "diff"
 
     if name.startswith("mistralai/mixtral"):
-        print("Picking whole file edit for mistral")
-        return "whole" #TODO, create separate coder
+        return "mixtral" #TODO, create separate coder
 
     return "whole"
