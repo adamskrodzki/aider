@@ -844,6 +844,7 @@ class Coder:
 
         for edit in edits:
             path = edit[0]
+            print("path to edit:", path)
             if path in seen:
                 allowed = seen[path]
             else:
