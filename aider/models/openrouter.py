@@ -12,6 +12,7 @@ class OpenRouterModel(Model):
 
     def __init__(self, client, name):
         global cached_model_details
+        print("CLIENT: ", client.base_url)
         if name.startswith("mistralai/mixtral"):
             self.max_context_tokens = 32 * 1024  # 32 known tokens, is this even needed ? Line 77 overrides or 82 throws
             # Ensure the client is using openrouter.ai base URL for this model

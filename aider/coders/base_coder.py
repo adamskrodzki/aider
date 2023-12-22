@@ -693,8 +693,13 @@ class Coder:
 
         tokens = None
         if hasattr(completion, "usage"):
-            prompt_tokens = completion.usage.prompt_tokens
-            completion_tokens = completion.usage.completion_tokens
+            prompt_tokens = 0
+            completion_tokens = 0
+            try:
+                prompt_tokens = completion.usage.prompt_tokens
+                completion_tokens = completion.usage.completion_tokens
+            except:
+                print("no usage info")
 
             tokens = f"{prompt_tokens} prompt tokens, {completion_tokens} completion tokens"
             if self.main_model.prompt_price:
