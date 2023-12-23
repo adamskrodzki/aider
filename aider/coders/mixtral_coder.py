@@ -28,10 +28,12 @@ class MixtralCoder(Coder):
         for path, original, updated in edits:
             full_path = self.abs_root_path(path)
             content = self.io.read_text(full_path)
-            content = do_replace(full_path, content, original, updated, self.fence)
+            original_content = content
+            content = do_replace(full_path, content, original, updated, lambda text: self.io.append_chat_history(text, True), self.fence)
             if content:
                 self.io.write_text(full_path, content)
                 continue
+            print ("Error in edit",path, original, updated)
             raise ValueError(f"""InvalidEditBlock: edit failed!
 
 {path} does not contain the *exact chunk* of SEARCH lines you specified.
@@ -42,6 +44,12 @@ The SEARCH block needs to be EXACTLY the same as the lines in {path} with nothin
 {path} does not contain these {len(original.splitlines())} exact lines in a row:
 ```
 {original}```
+
+current actual content of the file is
+
+```
+{original_content}
+```
 """)
 
 
@@ -75,8 +83,10 @@ def perfect_replace(whole_lines, part_lines, replace_lines):
             return "".join(res)
 
 
-def replace_most_similar_chunk(whole, part, replace):
+def replace_most_similar_chunk(whole, part, replace, log):
     """Best efforts to find the `part` lines in `whole` and replace them with `replace`"""
+    log("Executing replace_most_similar_chunk")
+    print("Executing replace_most_similar_chunk")
 
     whole, whole_lines = prep(whole)
     part, part_lines = prep(part)
@@ -95,14 +105,16 @@ def replace_most_similar_chunk(whole, part, replace):
 
     # Try to handle when it elides code with ...
     try:
+        log("Executing try_dotdotdots")
         res = try_dotdotdots(whole, part, replace)
         if res:
+            log("Executing try_dotdotdots Success")
             return res
     except ValueError:
         pass
 
     return
-    # Try fuzzy matching
+    # Try fuzzy matching, TODO: Test, try to improve
     res = replace_closest_edit_distance(whole_lines, part, part_lines, replace_lines)
     if res:
         return res
@@ -215,12 +227,15 @@ def match_but_for_leading_whitespace(whole_lines, part_lines):
 
 
 def replace_closest_edit_distance(whole_lines, part, part_lines, replace_lines):
+
+    self.io.append_chat_history("Executing replace_closest_edit_distance", True)
     similarity_thresh = 0.8
 
     max_similarity = 0
     most_similar_chunk_start = -1
     most_similar_chunk_end = -1
 
+#works only if difference smaller than 10%
     scale = 0.1
     min_len = math.floor(len(part_lines) * (1 - scale))
     max_len = math.ceil(len(part_lines) * (1 + scale))
@@ -237,6 +252,8 @@ def replace_closest_edit_distance(whole_lines, part, part_lines, replace_lines):
                 most_similar_chunk_start = i
                 most_similar_chunk_end = i + length
 
+    self.io.append_chat_history("Max Similarity:"+str(max_similarity) , True)
+    self.io.append_chat_history("Treshold Similarity:"+str(similarity_thresh) , True)
     if max_similarity < similarity_thresh:
         return
 
@@ -282,7 +299,7 @@ def strip_quoted_wrapping(res, fname=None, fence=DEFAULT_FENCE):
     return res
 
 
-def do_replace(fname, content, before_text, after_text, fence=None):
+def do_replace(fname, content, before_text, after_text, log, fence=None):
     before_text = strip_quoted_wrapping(before_text, fname, fence)
     after_text = strip_quoted_wrapping(after_text, fname, fence)
     fname = Path(fname)
@@ -299,7 +316,7 @@ def do_replace(fname, content, before_text, after_text, fence=None):
         # append to existing file, or start a new file
         new_content = content + after_text
     else:
-        new_content = replace_most_similar_chunk(content, before_text, after_text)
+        new_content = replace_most_similar_chunk(content, before_text, after_text, log)
 
     return new_content
 
@@ -348,6 +365,7 @@ def find_original_update_blocks(content, fence=DEFAULT_FENCE):
 
             if cur in (DIVIDER, UPDATED):
                 processed.append(cur)
+                
                 raise ValueError(f"Unexpected {cur}")
 
             if cur.strip() != HEAD:

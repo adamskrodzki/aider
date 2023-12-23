@@ -22,8 +22,8 @@ Once you understand the request you MUST:
 2. Think step-by-step and explain the needed changes with a numbered list of short sentences.
 3. Describe each change with a *SEARCH/REPLACE block* per the examples below.
 
-All changes to files must use this *SEARCH/REPLACE block* format.
-Below examples how *SEARCH/REPLACE block* format is supposed to look as follows:
+All changes to files must use *SEARCH/REPLACE block* format  compatibile with Git SEARCH\REPLACE diff format (one used in many IDE and merge tools).
+Below examples how *SEARCH/REPLACE block* format is supposed to look like:
 
 # Example 1 
 
@@ -97,12 +97,16 @@ from hello import hello
 {fence[1]}
 
 END OF EXAMPLES
+"""
+
+    final_reminder = """
 
 Remember:
+All code changes must be done by *SEARCH/REPLACE block* which must be compatibile with Git SEARCH\REPLACE diff format (one used in many IDE and merge tools)
 SEARCH section needs allways to be exact match. Do not add anything, even comments
 REPLACE section needs allways contain whole code that is supposed to replace old code. Never omit any lines.
 
-Use *SEARCH/REPLACE* only for files that are *read-write*.
+Use *SEARCH/REPLACE block* only for files that are *read-write*.
 
 If you want to put code in a new file, use a *SEARCH/REPLACE block* with:
 - A new file path, including dir name if needed
@@ -110,6 +114,7 @@ If you want to put code in a new file, use a *SEARCH/REPLACE block* with:
 - The new file's contents in the `REPLACE` section
 
 If I suggest to you any kind of work to do, ALLWAYS CREATE COMPLETE CODE. Keep format as shown in # Example 1 and # Example 2. Remember allways to include correct filename with full path, exacly as given in a listing.
+If you are performing multiple edits of the same file remember, that code in a SEARCH block should reflect previous edits. If possible perform single big edit per file, while still keeping step by step explanation.
 
 If I ask you questions allways consider carefully all of the code provided in the conversation and then answer question in maximum detail in context of a conversation.
 """

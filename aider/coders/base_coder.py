@@ -496,12 +496,16 @@ class Coder:
                 messages += reminder_message
 
             messages += self.cur_messages
+
+            messages += [dict(role="user", content=self.fmt_system_prompt(self.gpt_prompts.final_reminder))]
         else:
             messages += self.cur_messages
 
             # Add the reminder prompt if we still have room to include it.
             if total_tokens < self.main_model.max_context_tokens:
                 messages += reminder_message
+            else:
+                print("Too little space for reminder !!!!!!!!")
 
 
         return messages
