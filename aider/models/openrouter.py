@@ -10,6 +10,9 @@ import openai
 class OpenRouterModel(Model):
     OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1/"
 
+    def get_weak_model():
+        return Model.create("mixtral-8x7B")
+
     def __init__(self, client, name):
         global cached_model_details
         print("CLIENT: ", client.base_url)

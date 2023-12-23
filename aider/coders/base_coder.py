@@ -208,7 +208,7 @@ class Coder:
 
         self.summarizer = ChatSummary(
             self.client,
-            models.Model.weak_model(),
+            self.main_model.get_weak_model(),
             self.main_model.max_chat_history_tokens,
         )
 
@@ -980,7 +980,7 @@ class Coder:
 
     def auto_commit(self, edited):
         context = self.get_context_from_history(self.cur_messages)
-        res = self.repo.commit(fnames=edited, context=context, prefix="aider: ")
+        res = self.repo.commit(fnames=edited, context=context, prefix="aider: ", model=self.model.get_weak_model())
         if res:
             commit_hash, commit_message = res
             self.last_aider_commit_hash = commit_hash
@@ -1001,7 +1001,7 @@ class Coder:
         if not self.repo:
             return
 
-        self.repo.commit(fnames=self.need_commit_before_edits)
+        self.repo.commit(fnames=self.need_commit_before_edits, model = self.model.get_weak_model())
 
         # files changed, move cur messages back behind the files messages
         self.move_back_cur_messages(self.gpt_prompts.files_content_local_edits)

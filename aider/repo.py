@@ -57,7 +57,7 @@ class GitRepo:
         if aider_ignore_file:
             self.aider_ignore_file = Path(aider_ignore_file)
 
-    def commit(self, fnames=None, context=None, prefix=None, message=None):
+    def commit(self, fnames=None, context=None, prefix=None, message=None, model =None):
         if not fnames and not self.repo.is_dirty():
             return
 
@@ -68,7 +68,7 @@ class GitRepo:
         if message:
             commit_message = message
         else:
-            commit_message = self.get_commit_message(diffs, context)
+            commit_message = self.get_commit_message(diffs, context, model)
 
         if not commit_message:
             commit_message = "(no commit message provided)"
@@ -101,7 +101,7 @@ class GitRepo:
         except ValueError:
             return self.repo.git_dir
 
-    def get_commit_message(self, diffs, context):
+    def get_commit_message(self, diffs, context, model):
         if len(diffs) >= 4 * 1024 * 4:
             self.io.tool_error("Diff is too large to generate a commit message.")
             return
@@ -118,9 +118,17 @@ class GitRepo:
             dict(role="user", content=content),
         ]
 
-        for model in models.Model.commit_message_models():
+        all_models = []
+
+        if model:
+            all_models += [model]
+
+        all_models += models.Model.commit_message_models()
+
+        for model in all_models:
             commit_message = simple_send_with_retries(self.client, model.name, messages)
             if commit_message:
+                print("Commitmessage generated using", model.name)
                 break
 
         if not commit_message:

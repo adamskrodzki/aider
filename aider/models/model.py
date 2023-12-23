@@ -30,14 +30,15 @@ class Model:
     def __str__(self):
         return self.name
 
+    def get_weak_model():
+        return Model.create("gpt-3.5-turbo-1106")
+
     @staticmethod
     def strong_model():
         return Model.create("gpt-4")
 
     @staticmethod
     def weak_model():
-        if name == "mixtral-8x7B":
-            return "mixtral-8x7B"
         return Model.create("gpt-3.5-turbo-1106")
 
     @staticmethod

@@ -12,6 +12,7 @@ class ChatSummary:
         self.tokenizer = model.tokenizer
         self.max_tokens = max_tokens
         self.model = model
+        print("Chat Summary initialized with", self.model.name)
 
     def too_big(self, messages):
         sized = self.tokenize(messages)
@@ -94,6 +95,7 @@ class ChatSummary:
 
 
 def main():
+    raise ValueError(f"Where the fuck this is called?")
     parser = argparse.ArgumentParser()
     parser.add_argument("filename", help="Markdown file to parse")
     args = parser.parse_args()
