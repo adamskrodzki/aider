@@ -36,6 +36,8 @@ class Model:
 
     @staticmethod
     def weak_model():
+        if name == "mixtral-8x7B":
+            return "mixtral-8x7B"
         return Model.create("gpt-3.5-turbo-1106")
 
     @staticmethod
