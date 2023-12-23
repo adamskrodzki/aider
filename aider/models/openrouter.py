@@ -10,8 +10,8 @@ import openai
 class OpenRouterModel(Model):
     OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1/"
 
-    def get_weak_model():
-        return Model.create("mixtral-8x7B")
+    def get_weak_model(self):
+        return Model.create("mixtral-8x7B",client = self.client)
 
     def __init__(self, client, name):
         global cached_model_details
@@ -27,6 +27,7 @@ class OpenRouterModel(Model):
             client.base_url = openai.api_base
 
         self.name = name
+        self.client = client
         self.edit_format = edit_format_for_model(name)
         self.use_repo_map = self.edit_format == "diff"
 
@@ -92,6 +93,6 @@ def edit_format_for_model(name):
         return "diff"
 
     if name.startswith("mistralai/mixtral"):
-        return "mixtral" #TODO, create separate coder
-
+        return "mixtral" 
+        
     return "whole"

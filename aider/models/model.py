@@ -30,7 +30,7 @@ class Model:
     def __str__(self):
         return self.name
 
-    def get_weak_model():
+    def get_weak_model(self):
         return Model.create("gpt-3.5-turbo-1106")
 
     @staticmethod

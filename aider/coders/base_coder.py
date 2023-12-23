@@ -519,7 +519,8 @@ class Coder:
         messages = self.format_messages()
 
         if self.verbose:
-            utils.show_messages(messages, functions=self.functions)
+            printout = utils.show_messages(messages, functions=self.functions)
+            self.io.append_chat_history(printout)
 
         exhausted = False
         interrupted = False
@@ -668,8 +669,6 @@ class Coder:
         return interrupted
 
     def show_send_output(self, completion):
-        if self.verbose:
-            print(completion)
 
         show_func_err = None
         show_content_err = None
