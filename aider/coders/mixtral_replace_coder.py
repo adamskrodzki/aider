@@ -5,15 +5,15 @@ from pathlib import Path
 
 from ..dump import dump  # noqa: F401
 from .base_coder import Coder
-from .mixtral_prompts import MixtralPrompts
+from .mixtral_replace_prompts import MixtralReplacePrompts
 
 
-class MixtralCoder(Coder):
+class MixtralReplaceCoder(Coder):
     edit_format = "diff"
 
     def __init__(self, *args, **kwargs):
-        self.gpt_prompts = MixtralPrompts()
-        self.custom_prefixes = True 
+        self.gpt_prompts = MixtralReplacePrompts()
+        self.mixtral_optimized = True 
         super().__init__(*args, **kwargs)
 
     def get_edits(self):

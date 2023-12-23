@@ -3,7 +3,7 @@
 from .base_prompts import CoderPrompts
 
 
-class MixtralPrompts(CoderPrompts):
+class MixtralReplacePrompts(CoderPrompts):
     main_system = """
 """
 
