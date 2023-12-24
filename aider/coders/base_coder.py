@@ -510,6 +510,12 @@ class Coder:
 
         return messages
 
+    def generate_optimized_message():
+        #takes whole content of context
+        #sends it to llm and asks of clear and concise instruction targeted to developer what to do
+        # returns the answer to be better version of `inp`
+        return
+
     def send_new_user_message(self, inp):
 
         self.cur_messages += [
@@ -517,6 +523,8 @@ class Coder:
         ]
 
         messages = self.format_messages()
+
+        printout = utils.show_messages(messages, functions=self.functions)
 
         if self.verbose:
             printout = utils.show_messages(messages, functions=self.functions)

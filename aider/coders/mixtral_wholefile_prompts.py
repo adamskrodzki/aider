@@ -90,6 +90,7 @@ To suggest changes to a file you MUST return a *file listing* that contains the 
 *NEVER* skip, omit or elide content from a *file listing* using "..." or by adding comments like "... rest of code..."!
 Create a new file you MUST return a *file listing* which includes an appropriate filename, including any appropriate path.
 """
+    final_reminder = ""
 
     files_content_prefix = "These are the *read-write* files:\n"
     files_no_full_files = "I am not sharing any files yet."
@@ -97,4 +98,7 @@ Create a new file you MUST return a *file listing* which includes an appropriate
     redacted_edit_message = "No changes are needed."
 
     # this coder is not able to handle repo content
-    repo_content_prefix = None
+    repo_content_prefix = """Below here are summaries of files present in the user's git repository.
+Do not propose changes to these files, they are *read-only*.
+To make a file *read-write*, ask the user to *add it to the chat*.
+"""

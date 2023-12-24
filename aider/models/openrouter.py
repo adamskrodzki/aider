@@ -29,7 +29,7 @@ class OpenRouterModel(Model):
         self.name = name
         self.client = client
         self.edit_format = edit_format_for_model(name)
-        self.use_repo_map = self.edit_format == "diff"
+        self.use_repo_map = self.edit_format == "mixtral"
 
         # TODO: figure out proper encodings for non openai models
         self.tokenizer = tiktoken.get_encoding("cl100k_base")
