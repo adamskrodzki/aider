@@ -90,7 +90,7 @@ To suggest changes to a file you MUST return a *file listing* that contains the 
 *NEVER* skip, omit or elide content from a *file listing* using "..." or by adding comments like "... rest of code..."!
 Create a new file you MUST return a *file listing* which includes an appropriate filename, including any appropriate path.
 """
-    final_reminder = ""
+    final_reminder = " "
 
     files_content_prefix = "These are the *read-write* files:\n"
     files_no_full_files = "I am not sharing any files yet."

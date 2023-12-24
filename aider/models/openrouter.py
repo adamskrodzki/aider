@@ -95,4 +95,5 @@ def edit_format_for_model(name):
     if name.startswith("mistralai/mixtral"):
         return "mixtral" 
         
+    print(name, "Using whole")
     return "whole"

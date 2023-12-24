@@ -86,10 +86,12 @@ class Coder:
         if edit_format == "diff":
             return EditBlockCoder(client, main_model, io, **kwargs)
         elif edit_format == "whole":
+            print("using WholeFileCoder")
             return WholeFileCoder(client, main_model, io, **kwargs)
         elif edit_format == "udiff":
             return UnifiedDiffCoder(client, main_model, io, **kwargs)
         elif edit_format == "mixtral":
+            print("using MixtralWholeFileCoder")
             return MixtralWholeFileCoder(client, main_model, io, **kwargs)
         else:
             raise ValueError(f"Unknown edit format {edit_format}")
@@ -496,6 +498,8 @@ class Coder:
                 messages += reminder_message
 
             messages += self.cur_messages
+
+            print(self.gpt_prompts.system_reminder)
 
             messages += [dict(role="user", content=self.fmt_system_prompt(self.gpt_prompts.final_reminder))]
         else:
