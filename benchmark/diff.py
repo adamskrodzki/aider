@@ -18,8 +18,15 @@ def compare_benchmarks(benchmark1, benchmark2):
         result1_path = os.path.join(benchmark1, test, '.aider.results.json')
         result2_path = os.path.join(benchmark2, test, '.aider.results.json')
 
-        result1 = read_results(result1_path)['test_outcomes']
-        result2 = read_results(result2_path)['test_outcomes']
+        result1_data = read_results(result1_path)
+        result2_data = read_results(result2_path)
+
+        if 'test_outcomes' not in result1_data or 'test_outcomes' not in result2_data:
+            print(f"Warning: 'test_outcomes' key not found in the results for test '{test}'.")
+            continue
+
+        result1 = result1_data['test_outcomes']
+        result2 = result2_data['test_outcomes']
 
         for outcome1, outcome2 in zip(result1, result2):
             if outcome1 and not outcome2:
