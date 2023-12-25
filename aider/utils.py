@@ -74,19 +74,27 @@ def safe_abs_path(res):
 def show_messages(messages, title=None, functions=None) -> str:
     output = []
     if title:
-        output.append(f"{title.upper()} {'*' * 50}")
+        title_output = f"{title.upper()} {'*' * 50}"
+        print(title_output)
+        output.append(title_output)
 
     for msg in messages:
         role = msg["role"].upper()
         content = msg.get("content")
         if content:
             for line in content.splitlines():
-                output.append(f"{role} {line}")
+                line_output = f"{role} {line}"
+                print(line_output)
+                output.append(line_output)
         content = msg.get("function_call")
         if content:
-            output.append(f"{role} {content}")
+            func_output = f"{role} {content}"
+            print(func_output)
+            output.append(func_output)
 
     if functions:
-        output.append(dump(functions))
+        functions_output = dump(functions)
+        print(functions_output)
+        output.append(functions_output)
 
     return "\n".join(output)
