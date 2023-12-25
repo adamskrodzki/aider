@@ -479,6 +479,11 @@ class Coder:
         return messages
 
     def send_new_user_message(self, inp):
+        improved_message = self.preliminary_message_improvement(inp, self.verbose)
+        self.cur_messages += [
+            dict(role="user", content=improved_message),
+        ]
+
         self.cur_messages += [
             dict(role="user", content=inp),
         ]
@@ -548,6 +553,14 @@ class Coder:
         add_rel_files_message = self.check_for_file_mentions(content)
         if add_rel_files_message:
             return add_rel_files_message
+
+    def preliminary_message_improvement(self, inp, verbose):
+        # This is a placeholder for the actual implementation of the message improvement logic.
+        # You would replace the following line with the actual logic to improve the message.
+        if verbose:
+            utils.show_messages([{"role": "user", "content": inp}], functions=self.functions)
+        # Return the improved message. Currently, it just echoes the input for demonstration.
+        return inp
 
     def update_cur_messages(self, edited):
         if self.partial_response_content:
