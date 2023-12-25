@@ -188,6 +188,12 @@ def main(argv=None, input=None, output=None, force_git_root=None):
         help="Specify the api base url",
     )
     model_group.add_argument(
+        "--refine",
+        action="store_true",
+        help="Enable refinement process in the Coder",
+        default=False,
+    )
+    model_group.add_argument(
         "--openai-api-type",
         metavar="OPENAI_API_TYPE",
         help="Specify the api_type",
@@ -291,12 +297,6 @@ def main(argv=None, input=None, output=None, force_git_root=None):
         ),
     )
     output_group.add_argument(
-        "--refine",
-        action="store_true",
-        help="Enable refinement process in the Coder",
-        default=False,
-    )
-    output_group.add_argument(
         "--show-diffs",
         action="store_true",
         help="Show diffs when committing changes (default: False)",
@@ -325,12 +325,6 @@ def main(argv=None, input=None, output=None, force_git_root=None):
         metavar="AIDERIGNORE",
         default=default_aiderignore_file,
         help="Specify the aider ignore file (default: .aiderignore in git root)",
-    )
-    git_group.add_argument(
-        "--refine",
-        action="store_true",
-        help="Enable refinement process in the Coder",
-        default=False,
     )
     git_group.add_argument(
         "--auto-commits",
@@ -364,12 +358,6 @@ def main(argv=None, input=None, output=None, force_git_root=None):
         action="version",
         version=f"%(prog)s {__version__}",
         help="Show the version number and exit",
-    )
-    other_group.add_argument(
-        "--refine",
-        action="store_true",
-        help="Enable refinement process in the Coder",
-        default=False,
     )
     other_group.add_argument(
         "--apply",
@@ -415,12 +403,6 @@ def main(argv=None, input=None, output=None, force_git_root=None):
         "--encoding",
         default="utf-8",
         help="Specify the encoding for input and output (default: utf-8)",
-    )
-    other_group.add_argument(
-        "--refine",
-        action="store_true",
-        help="Enable refinement process in the Coder",
-        default=False,
     )
     other_group.add_argument(
         "-c",
