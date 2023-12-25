@@ -25,6 +25,7 @@ from aider.repomap import RepoMap
 from aider.sendchat import send_with_retries
 
 from ..dump import dump  # noqa: F401
+from .refinement_messages import preliminary_message_improvement_prompt
 
 
 class MissingAPIKeyError(ValueError):
@@ -564,13 +565,7 @@ class Coder:
             return add_rel_files_message
 
     def preliminary_message_improvement(self, inp, context):
-        query_message = ("Your task is to improve (if possible) following user's request:\n{inp}"
-        "\n\n So it is more useful for expert software developer, to understand and carry on user's request  \n"
-        "Rewrite request in concise, factually corect manner, include relevant details from the context above\n"
-        "If possible, provide detailed plan how to carry on the task, but avoid writing code, that will be done by software developer in next step\n"
-        "If provided context contains relevant information, cite that information"
-        "If provided context is empty or irrelevant for user's request do not mind up any generic information,"
-        "just improve on wording of a request")
+        query_message = preliminary_message_improvement_prompt.format(inp=inp)
 
         messages=[
             dict(role="user", content="Context provided:\n"+context),
