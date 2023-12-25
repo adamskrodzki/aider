@@ -111,6 +111,7 @@ class Coder:
         use_git=True,
         voice_language=None,
         aider_ignore_file=None,
+        perform_refinement=False,
     ):
         self.client = client
 
@@ -139,6 +140,7 @@ class Coder:
         self.dirty_commits = dirty_commits
         self.assistant_output_color = assistant_output_color
         self.code_theme = code_theme
+        self.perform_refinement = perform_refinement
 
         self.dry_run = dry_run
         self.pretty = pretty
