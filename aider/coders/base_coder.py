@@ -482,15 +482,13 @@ class Coder:
         self.cur_messages += [
             dict(role="user", content=inp),
         ]
+
         
         messages = self.format_messages()
 
         if(self.perform_refinement):
-            print("Performing refinment")
             context_dump = utils.show_messages(messages, functions=self.functions, do_print=False)
             improved_message = self.preliminary_message_improvement(inp, context_dump)
-            print("Original message:", inp)
-            print("Refined message:", improved_message)
             if (len(improved_message)>1):
                 self.cur_messages += [
                     dict(role="user", content=improved_message),
