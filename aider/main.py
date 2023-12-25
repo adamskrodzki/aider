@@ -555,7 +555,7 @@ def main(argv=None, input=None, output=None, force_git_root=None):
             use_git=args.git,
             voice_language=args.voice_language,
             aider_ignore_file=args.aiderignore,
-        perform_refinement=args.refine,
+            perform_refinement=args.refine,
         )
     except ValueError as err:
         io.tool_error(str(err))
