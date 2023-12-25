@@ -479,14 +479,22 @@ class Coder:
         return messages
 
     def send_new_user_message(self, inp):
-        improved_message = self.preliminary_message_improvement(inp, self.verbose)
-        self.cur_messages += [
-            dict(role="user", content=improved_message),
-        ]
-
         self.cur_messages += [
             dict(role="user", content=inp),
         ]
+        
+        messages = self.format_messages()
+
+        if(self.perform_refinement):
+            print("Performing refinment")
+            context_dump = utils.show_messages(messages, functions=self.functions, do_print=False)
+            improved_message = self.preliminary_message_improvement(inp, context_dump)
+            print("Original message:", inp)
+            print("Refined message:", improved_message)
+            if (len(improved_message)>1):
+                self.cur_messages += [
+                    dict(role="user", content=improved_message),
+                ]
 
         messages = self.format_messages()
 
@@ -554,13 +562,25 @@ class Coder:
         if add_rel_files_message:
             return add_rel_files_message
 
-    def preliminary_message_improvement(self, inp, verbose):
-        # This is a placeholder for the actual implementation of the message improvement logic.
-        # You would replace the following line with the actual logic to improve the message.
-        if verbose:
-            utils.show_messages([{"role": "user", "content": inp}], functions=self.functions)
-        # Return the improved message. Currently, it just echoes the input for demonstration.
-        return inp
+    def preliminary_message_improvement(self, inp, context):
+        query_message = ("Your task is to improve (if possible following) user's request:\n{inp}"
+        "\n\n So it is more useful for expert software developer, to carry on user's request  \n"
+        "Rewrite request in concise, factually corect manner, include relevant details from context above\n"
+        "And If possible, provide detaled plan how to carry on the task\n"
+        "If provided context is empty or irrelevant for user's request do not mind up any generic information,"
+        "just improve on wording of a request")
+
+        messages=[
+            dict(role="user", content="Context provided:\n"+context),
+            dict(role="user", content=query_message)]
+
+        try:
+            interrupted = self.send(messages)
+            if interrupted:
+                return ""
+            return self.partial_response_content
+        except Exception:
+            return ""
 
     def update_cur_messages(self, edited):
         if self.partial_response_content:
