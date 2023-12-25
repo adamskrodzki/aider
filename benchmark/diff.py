@@ -4,8 +4,11 @@ import os
 import sys
 
 def read_results(path):
+    print(f"Reading results from {path}")
     with open(path, 'r') as file:
-        return json.load(file)
+        content = file.read()
+        print(f"Content before parsing: {content}")
+        return json.loads(content)
 
 def compare_benchmarks(benchmark1, benchmark2):
     tests1 = set(os.listdir(benchmark1))
