@@ -453,9 +453,16 @@ class Commands:
             cmd_method = getattr(self, cmd_method_name, None)
             if cmd_method:
                 description = cmd_method.__doc__
-                self.io.tool_output(f"{cmd} {description}")
+                self.io.tool_output(f"{cmd} - {description}")
             else:
-                self.io.tool_output(f"{cmd} No description available.")
+                self.io.tool_output(f"{cmd} - No description available.")
+        self.io.tool_output("/togglerefine - Toggle the refinement process in the Coder")
+
+    def cmd_togglerefine(self, args):
+        "Toggle the refinement process in the Coder"
+        self.coder.toggle_refinement()
+        current_state = "enabled" if self.coder.perform_refinement else "disabled"
+        self.io.tool_output(f"Refinement process is now {current_state}.")
 
     def cmd_voice(self, args):
         "Record and transcribe voice input"

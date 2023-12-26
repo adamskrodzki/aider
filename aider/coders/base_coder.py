@@ -55,6 +55,7 @@ class Coder:
     last_keyboard_interrupt = None
     max_apply_update_errors = 3
     edit_format = None
+    perform_refinement = False
 
     @classmethod
     def create(
@@ -1021,3 +1022,5 @@ def check_model_availability(io, client, main_model):
     available_models = ", ".join(model_ids)
     io.tool_error(f"API key supports: {available_models}")
     return False
+    def toggle_refinement(self):
+        self.perform_refinement = not self.perform_refinement
