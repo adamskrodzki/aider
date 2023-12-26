@@ -26,7 +26,7 @@ from aider.sendchat import send_with_retries
 
 from ..dump import dump  # noqa: F401
 from .refinement_messages import preliminary_message_improvement_prompt
-from .refinement_messages import wrapped_message
+from .refinement_messages import system_message
 
 
 class MissingAPIKeyError(ValueError):
@@ -482,18 +482,21 @@ class Coder:
         return messages
 
     def send_new_user_message(self, inp):
-        self.cur_messages += [
-            dict(role="user", content=inp),
-        ]
-
 
         if(self.perform_refinement):
-            improved_message = self.preliminary_message_improvement()
+            improved_message = self.preliminary_message_improvement(inp)
             if improved_message.strip():
-                wrapped_message_formatted = wrapped_message.format(analysis=improved_message)
                 self.cur_messages += [
-                    dict(role="user", content=wrapped_message_formatted),
+                    dict(role="user", content=improved_message),
                 ]
+            else:
+                self.cur_messages += [
+                    dict(role="user", content=inp),
+                ]
+        else:
+            self.cur_messages += [
+                dict(role="user", content=inp),
+            ]
 
         messages = self.format_messages()
 
@@ -561,19 +564,17 @@ class Coder:
         if add_rel_files_message:
             return add_rel_files_message
 
-    def preliminary_message_improvement(self):
+    def preliminary_message_improvement(self, users_prompt):
 
-        main_sys = preliminary_message_improvement_prompt
+        main_sys = system_message
 
-        messages = [
-            dict(role="system", content=main_sys),
-        ]
+        messages = [dict(role="system", content=main_sys)]
 
         self.summarize_end()
         messages += self.done_messages
         messages += self.get_files_messages()
 
-        messages += self.cur_messages
+        messages += [ dict(role="user", content=preliminary_message_improvement_prompt.format(prompt = users_prompt))]
             
         if self.verbose:
             utils.show_messages(messages, functions=self.functions, title="Analysis")
@@ -990,6 +991,9 @@ class Coder:
 
         self.io.tool_output("No changes made to git tracked files.")
         return self.gpt_prompts.files_content_gpt_no_edits
+    
+    def toggle_refinement(self):
+        self.perform_refinement = not self.perform_refinement
 
     def dirty_commit(self):
         if not self.need_commit_before_edits:
@@ -1022,5 +1026,3 @@ def check_model_availability(io, client, main_model):
     available_models = ", ".join(model_ids)
     io.tool_error(f"API key supports: {available_models}")
     return False
-    def toggle_refinement(self):
-        self.perform_refinement = not self.perform_refinement
