@@ -15,11 +15,11 @@ Help by improving prompt's quality by:
     - improvment of clarity of the prompt
     - removal of meaningless or misliding statements
     - emphasis on important information
-    - adding references to relevaant code included after  'Here is the current content of the files' 
+    - adding references to relevaant code included in conversation after  'Here is the current content of the files' 
     - taking into account relevant information from history of conversation
     - providing step by step guidance on how to carry on the task in best possible way.
 
-    Keep prompt maximally concise, but remember to not remove any relevant information
+    Keep prompt maximally usefut, while concise, but remember to not remove any relevant information
  Refined Prompt:
 """
 system_message = """
