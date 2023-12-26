@@ -583,6 +583,8 @@ class Coder:
             interrupted = self.send(messages)
             if interrupted:
                 return ""
+            if self.verbose:
+                print("Refined message:",self.partial_response_content) 
             return self.partial_response_content
         except Exception:
             return ""
