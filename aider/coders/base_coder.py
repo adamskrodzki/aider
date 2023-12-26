@@ -455,7 +455,8 @@ class Coder:
             dict(role="system", content=main_sys),
         ]
 
-        self.summarize_end()
+        if(not self.perform_refinement):
+            self.summarize_end()
         messages += self.done_messages
         messages += self.get_files_messages()
 
