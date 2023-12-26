@@ -572,10 +572,6 @@ class Coder:
         messages += self.done_messages
         messages += self.get_files_messages()
 
-        reminder_message = [
-            dict(role="system", content=main_sys),
-        ]
-
         messages += self.cur_messages
             
         if self.verbose:
