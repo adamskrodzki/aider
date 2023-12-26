@@ -425,6 +425,7 @@ def main(
     no_unit_tests: bool = typer.Option(False, "--no-unit-tests", help="Do not run unit tests"),
     no_aider: bool = typer.Option(False, "--no-aider", help="Do not run aider"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Verbose output"),
+    refine: bool = typer.Option(False, "--refine", help="Refine user's request before solving"),
     stats_only: bool = typer.Option(
         False, "--stats", "-s", help="Do not run tests, just collect stats on completed tests"
     ),
@@ -512,6 +513,7 @@ def main(
                 no_unit_tests,
                 no_aider,
                 verbose,
+                refine,
                 commit_hash,
                 replay,
                 max_apply_update_errors,
@@ -531,6 +533,7 @@ def main(
                 no_unit_tests,
                 no_aider,
                 verbose,
+                refine,
                 commit_hash,
                 replay,
                 max_apply_update_errors,
@@ -731,6 +734,7 @@ def run_test(
     no_unit_tests,
     no_aider,
     verbose,
+    refine,
     commit_hash,
     replay,
     max_apply_update_errors,
@@ -807,6 +811,7 @@ def run_test(
         stream=False,
         pretty=False,
         verbose=verbose,
+        perform_refinement=refine,
     )
     coder.max_apply_update_errors = max_apply_update_errors
 
