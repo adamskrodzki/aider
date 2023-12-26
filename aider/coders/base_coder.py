@@ -25,8 +25,8 @@ from aider.repomap import RepoMap
 from aider.sendchat import send_with_retries
 
 from ..dump import dump  # noqa: F401
-from .refinement_messages import preliminary_message_improvement_prompt
-from .refinement_messages import system_message
+from .refinement_prompts import preliminary_message_improvement_prompt
+from .refinement_prompts import system_message
 
 
 class MissingAPIKeyError(ValueError):
