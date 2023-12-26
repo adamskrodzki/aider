@@ -485,14 +485,11 @@ class Coder:
             dict(role="user", content=inp),
         ]
 
-        
-        messages = self.format_messages()
 
         if(self.perform_refinement):
-            context_dump = utils.show_messages(messages, functions=self.functions, do_print=False)
-            improved_message = self.preliminary_message_improvement(inp, context_dump)
+            improved_message = self.preliminary_message_improvement()
             if improved_message.strip():
-                wrapped_message_formatted = wrapped_message.format(summary=improved_message)
+                wrapped_message_formatted = wrapped_message.format(analysis=improved_message)
                 self.cur_messages += [
                     dict(role="user", content=wrapped_message_formatted),
                 ]
@@ -500,7 +497,7 @@ class Coder:
         messages = self.format_messages()
 
         if self.verbose:
-            utils.show_messages(messages, functions=self.functions)
+            utils.show_messages(messages, functions=self.functions, title = "Implementation")
 
         exhausted = False
         interrupted = False
@@ -563,12 +560,26 @@ class Coder:
         if add_rel_files_message:
             return add_rel_files_message
 
-    def preliminary_message_improvement(self, inp, context):
-        query_message = preliminary_message_improvement_prompt.format(inp=inp)
+    def preliminary_message_improvement(self):
 
-        messages=[
-            dict(role="user", content="Context provided:\n"+context),
-            dict(role="user", content=query_message)]
+        main_sys = preliminary_message_improvement_prompt
+
+        messages = [
+            dict(role="system", content=main_sys),
+        ]
+
+        self.summarize_end()
+        messages += self.done_messages
+        messages += self.get_files_messages()
+
+        reminder_message = [
+            dict(role="system", content=main_sys),
+        ]
+
+        messages += self.cur_messages
+            
+        if self.verbose:
+            utils.show_messages(messages, functions=self.functions, title="Analysis")
 
         try:
             interrupted = self.send(messages)
