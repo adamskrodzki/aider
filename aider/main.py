@@ -149,7 +149,7 @@ def main(argv=None, input=None, output=None, force_git_root=None):
         "--model",
         metavar="MODEL",
         default=models.GPT4_0613.name,
-        help=f"Specify the model to use for the main chat (default: {models.GPT4.name})",
+        help=f"Specify the model to use for the main chat (default: {models.GPT4.name}, mixtral-8x7B)",
     )
     core_group.add_argument(
         "--skip-model-availability-check",

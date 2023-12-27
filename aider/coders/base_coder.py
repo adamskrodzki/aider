@@ -53,6 +53,7 @@ class Coder:
     last_keyboard_interrupt = None
     max_apply_update_errors = 3
     edit_format = None
+    mixtral_optimized = False
 
     @classmethod
     def create(
@@ -64,7 +65,7 @@ class Coder:
         skip_model_availabily_check=False,
         **kwargs,
     ):
-        from . import EditBlockCoder, UnifiedDiffCoder, WholeFileCoder
+        from . import EditBlockCoder, UnifiedDiffCoder, WholeFileCoder, MixtralWholeFileCoder
 
         if not main_model:
             main_model = models.GPT4
@@ -85,9 +86,13 @@ class Coder:
         if edit_format == "diff":
             return EditBlockCoder(client, main_model, io, **kwargs)
         elif edit_format == "whole":
+            print("using WholeFileCoder")
             return WholeFileCoder(client, main_model, io, **kwargs)
         elif edit_format == "udiff":
             return UnifiedDiffCoder(client, main_model, io, **kwargs)
+        elif edit_format == "mixtral":
+            print("using MixtralWholeFileCoder")
+            return MixtralWholeFileCoder(client, main_model, io, **kwargs)
         else:
             raise ValueError(f"Unknown edit format {edit_format}")
 
@@ -205,7 +210,7 @@ class Coder:
 
         self.summarizer = ChatSummary(
             self.client,
-            models.Model.weak_model(),
+            self.main_model.get_weak_model(),
             self.main_model.max_chat_history_tokens,
         )
 
@@ -236,7 +241,8 @@ class Coder:
 
     def abs_root_path(self, path):
         res = Path(self.root) / path
-        return utils.safe_abs_path(res)
+        sanitized_path = str(res).replace('\\', '')
+        return utils.safe_abs_path(sanitized_path)
 
     fences = [
         ("``" + "`", "``" + "`"),
@@ -298,9 +304,12 @@ class Coder:
 
         prompt = ""
         for fname, content in self.get_abs_fnames_content():
+            name_prefix = ""
+            if self.mixtral_optimized:
+                name_prefix = "File from repository:"
             relative_fname = self.get_rel_fname(fname)
             prompt += "\n"
-            prompt += relative_fname
+            prompt += (name_prefix + relative_fname)
             prompt += f"\n{self.fence[0]}\n"
 
             prompt += content
@@ -446,17 +455,32 @@ class Coder:
         main_sys = self.fmt_system_prompt(self.gpt_prompts.main_system)
         main_sys += "\n" + self.fmt_system_prompt(self.gpt_prompts.system_reminder)
 
-        messages = [
-            dict(role="system", content=main_sys),
-        ]
+        messages = []
 
-        self.summarize_end()
-        messages += self.done_messages
-        messages += self.get_files_messages()
+        if self.mixtral_optimized:
+            self.summarize_end()
+            messages += self.done_messages
+            messages += self.get_files_messages()
+            messages += [
+                dict(role="user", content=main_sys),
+                dict(role="assistant", content="Understood. I will follow your instructions carefully"),
+            ]
+        else:
+            messages += [
+                dict(role="system", content=main_sys),
+            ]
+            self.summarize_end()
+            messages += self.done_messages
+            messages += self.get_files_messages()
 
-        reminder_message = [
-            dict(role="system", content=self.fmt_system_prompt(self.gpt_prompts.system_reminder)),
-        ]
+
+
+        if self.mixtral_optimized == False:
+            reminder_message = [
+                dict(role="system", content=self.fmt_system_prompt(self.gpt_prompts.system_reminder)),
+            ]
+        else:
+            reminder_message = []
 
         messages_tokens = self.main_model.token_count(messages)
         reminder_tokens = self.main_model.token_count(reminder_message)
@@ -468,23 +492,47 @@ class Coder:
             # add the reminder anyway
             total_tokens = 0
 
-        messages += self.cur_messages
+        if self.mixtral_optimized:
+            # Add the reminder prompt if we still have room to include it.
+            if total_tokens < self.main_model.max_context_tokens:
+                messages += reminder_message
 
-        # Add the reminder prompt if we still have room to include it.
-        if total_tokens < self.main_model.max_context_tokens:
-            messages += reminder_message
+            messages += self.cur_messages
+
+            print(self.gpt_prompts.system_reminder)
+
+            messages += [dict(role="user", content=self.fmt_system_prompt(self.gpt_prompts.final_reminder))]
+        else:
+            messages += self.cur_messages
+
+            # Add the reminder prompt if we still have room to include it.
+            if total_tokens < self.main_model.max_context_tokens:
+                messages += reminder_message
+            else:
+                print("Too little space for reminder !!!!!!!!")
+
 
         return messages
 
+    def generate_optimized_message():
+        #takes whole content of context
+        #sends it to llm and asks of clear and concise instruction targeted to developer what to do
+        # returns the answer to be better version of `inp`
+        return
+
     def send_new_user_message(self, inp):
+
         self.cur_messages += [
             dict(role="user", content=inp),
         ]
 
         messages = self.format_messages()
 
+        printout = utils.show_messages(messages, functions=self.functions)
+
         if self.verbose:
-            utils.show_messages(messages, functions=self.functions)
+            printout = utils.show_messages(messages, functions=self.functions)
+            self.io.append_chat_history(printout)
 
         exhausted = False
         interrupted = False
@@ -633,8 +681,6 @@ class Coder:
         return interrupted
 
     def show_send_output(self, completion):
-        if self.verbose:
-            print(completion)
 
         show_func_err = None
         show_content_err = None
@@ -662,8 +708,13 @@ class Coder:
 
         tokens = None
         if hasattr(completion, "usage"):
-            prompt_tokens = completion.usage.prompt_tokens
-            completion_tokens = completion.usage.completion_tokens
+            prompt_tokens = 0
+            completion_tokens = 0
+            try:
+                prompt_tokens = completion.usage.prompt_tokens
+                completion_tokens = completion.usage.completion_tokens
+            except:
+                print("no usage info")
 
             tokens = f"{prompt_tokens} prompt tokens, {completion_tokens} completion tokens"
             if self.main_model.prompt_price:
@@ -841,6 +892,7 @@ class Coder:
 
         for edit in edits:
             path = edit[0]
+            print("path to edit:", path)
             if path in seen:
                 allowed = seen[path]
             else:
@@ -939,7 +991,7 @@ class Coder:
 
     def auto_commit(self, edited):
         context = self.get_context_from_history(self.cur_messages)
-        res = self.repo.commit(fnames=edited, context=context, prefix="aider: ")
+        res = self.repo.commit(fnames=edited, context=context, prefix="aider: ", model=self.model.get_weak_model())
         if res:
             commit_hash, commit_message = res
             self.last_aider_commit_hash = commit_hash
@@ -960,7 +1012,7 @@ class Coder:
         if not self.repo:
             return
 
-        self.repo.commit(fnames=self.need_commit_before_edits)
+        self.repo.commit(fnames=self.need_commit_before_edits, model = self.model.get_weak_model())
 
         # files changed, move cur messages back behind the files messages
         self.move_back_cur_messages(self.gpt_prompts.files_content_local_edits)

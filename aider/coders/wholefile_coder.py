@@ -11,6 +11,7 @@ class WholeFileCoder(Coder):
     edit_format = "whole"
 
     def __init__(self, *args, **kwargs):
+        print("Init WholeFilePrompts")
         self.gpt_prompts = WholeFilePrompts()
         super().__init__(*args, **kwargs)
 

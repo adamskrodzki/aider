@@ -370,6 +370,9 @@ def find_original_update_blocks(content, fence=DEFAULT_FENCE):
                 else:
                     raise ValueError(missing_filename_err)
 
+            # Sanitize the filename by removing escape characters
+            filename = filename.replace("\\", "")
+
             current_filename = filename
 
             original_text = pieces.pop()
